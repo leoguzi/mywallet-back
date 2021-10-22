@@ -1,12 +1,14 @@
 import express from "express";
 import cors from "cors";
-import { registerUser } from "./controllers/users.js";
+import { registerUser, logIn, logOut } from "./controllers/users.js";
 
 const server = express();
 server.use(cors());
 server.use(express.json());
 
 //USERS
-server.post("/users/register", registerUser);
+server.post("/register", registerUser);
+server.post("/login", logIn);
+server.post("/logout", logOut);
 
 export default server;
