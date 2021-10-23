@@ -20,7 +20,7 @@ async function registerUser(req, res) {
 
     await connection.query(
       `INSERT INTO users (name, email, password) VALUES ($1, $2, $3);`,
-      [name, email, encriptedPassword]
+      [name, email.toLowerCase(), encriptedPassword]
     );
     res.sendStatus(201);
   } catch (error) {
