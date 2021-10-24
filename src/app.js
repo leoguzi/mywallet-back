@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { registerUser, logIn, logOut } from "./controllers/users.js";
-import { insertEntrie } from "./controllers/entries.js";
+import { getEntries, insertEntry } from "./controllers/entries.js";
 
 const server = express();
 server.use(cors());
@@ -14,6 +14,7 @@ server.post("/logout", logOut);
 
 //ENTRIES
 
-server.post("/entries", insertEntrie);
+server.post("/entries", insertEntry);
+server.get("/entries", getEntries);
 
 export default server;

@@ -7,4 +7,9 @@ const userSchema = joi.object({
   passwordConfirm: joi.string().required().valid(joi.ref("password")),
 });
 
-export { userSchema };
+const entrySchema = joi.object({
+  value: joi.number().required(),
+  description: joi.string().min(3).max(50).required(),
+});
+
+export { userSchema, entrySchema };

@@ -32,17 +32,18 @@ async function registerUser(req, res) {
 async function logIn(req, res) {
   const { email, password } = req.body;
   try {
-    let user = await connection.query(`SELECT * FROM users WHERE email = $1`, [
+    let user = await connection.query(`SELECT * FROM users WHERE email = $1;`, [
       email,
     ]);
     if (user.rowCount === 0) {
       return res.sendStatus(404);
     }
     user = user.rows[0];
+
     if (bcrypt.compareSync(password, user.password)) {
       const token = uuid();
       await connection.query(
-        `INSERT INTO sessions (user_id, token) VALUES ($1, $2)`,
+        `INSERT INTO sessions (user_id, token) VALUES ($1, $2);`,
         [user.id, token]
       );
 
@@ -60,7 +61,7 @@ async function logOut(req, res) {
   const { token } = req.body;
   try {
     const response = await connection.query(
-      `DELETE FROM sessions WHERE token = $1`,
+      `DELETE FROM sessions WHERE token = $1;`,
       [token]
     );
     if (response.rowCount === 0) {
