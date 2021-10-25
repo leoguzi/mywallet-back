@@ -1,3 +1,3 @@
-import server from "./app.js";
+import app from "./app.js";
 
-server.listen(4000, () => "Server listening on port 4000");
+app.listen(4000, () => "Server listening on port 4000");

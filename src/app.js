@@ -3,18 +3,18 @@ import cors from "cors";
 import { registerUser, logIn, logOut } from "./controllers/users.js";
 import { getEntries, insertEntry } from "./controllers/entries.js";
 
-const server = express();
-server.use(cors());
-server.use(express.json());
+const app = express();
+app.use(cors());
+app.use(express.json());
 
 //USERS
-server.post("/register", registerUser);
-server.post("/login", logIn);
-server.post("/logout", logOut);
+app.post("/register", registerUser);
+app.post("/login", logIn);
+app.post("/logout", logOut);
 
 //ENTRIES
 
-server.post("/entries", insertEntry);
-server.get("/entries", getEntries);
+app.post("/entries", insertEntry);
+app.get("/entries", getEntries);
 
-export default server;
+export default app;

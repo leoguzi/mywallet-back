@@ -1,4 +1,4 @@
-import server from "../src/app.js";
+import app from "../src/app.js";
 import supertest from "supertest";
 import connection from "../src/database.js";
 
@@ -30,15 +30,12 @@ describe("POST /entries", () => {
 
   it("Returns 403 if no token", async () => {
     createSession();
-    const result = await supertest(server).post("/entries").send(body);
+    const result = await supertest(app).post("/entries").send(body);
     expect(result.status).toEqual(403);
   });
 
   it("Returns 401 if invalid token", async () => {
-    const result = await supertest(server)
-      .post("/entries")
-      .set(config)
-      .send(body);
+    const result = await supertest(app).post("/entries").set(config).send(body);
     expect(result.status).toEqual(401);
   });
 
@@ -48,7 +45,7 @@ describe("POST /entries", () => {
       value: 35000,
     };
 
-    const result = await supertest(server)
+    const result = await supertest(app)
       .post("/entries")
       .set(config)
       .send(invalidBody);
@@ -58,10 +55,7 @@ describe("POST /entries", () => {
   it("Returns 201 for insertion success", async () => {
     createSession();
 
-    const result = await supertest(server)
-      .post("/entries")
-      .set(config)
-      .send(body);
+    const result = await supertest(app).post("/entries").set(config).send(body);
     expect(result.status).toEqual(201);
   });
 });
@@ -74,7 +68,7 @@ describe("GET /entries", () => {
 
   it("Returns 403 if no token", async () => {
     createSession();
-    const result = await supertest(server).get("/entries");
+    const result = await supertest(app).get("/entries");
     expect(result.status).toEqual(403);
   });
 
@@ -83,13 +77,13 @@ describe("GET /entries", () => {
     const config = {
       Authorization: "Bearer tesettetaslkdflsdjaslkdj",
     };
-    const result = await supertest(server).get("/entries").set(config);
+    const result = await supertest(app).get("/entries").set(config);
     expect(result.status).toEqual(401);
   });
 
   it("Returns 200 if valid token", async () => {
     createSession();
-    const result = await supertest(server).get("/entries").set(config);
+    const result = await supertest(app).get("/entries").set(config);
     expect(result.status).toEqual(200);
   });
 });

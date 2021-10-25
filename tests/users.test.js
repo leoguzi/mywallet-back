@@ -1,4 +1,4 @@
-import server from "../src/app.js";
+import app from "../src/app.js";
 import supertest from "supertest";
 import connection from "../src/database.js";
 import bcrypt from "bcrypt";
@@ -18,7 +18,17 @@ async function createUser() {
     [userData.name, userData.email, userData.password]
   );
 }
+afterAll(async () => {
+  const result = await connection.query(
+    `SELECT * FROM users WHERE email = $1;`,
+    [userData.email]
+  );
+  const id = result.rows[0]?.id;
 
+  await connection.query(`DELETE FROM users WHERE id = $1;`, [id]);
+  await connection.query(`DELETE FROM sessions WHERE user_id = $1;`, [id]);
+  connection.end();
+});
 describe("POST /register", () => {
   afterEach(async () => {
     const result = await connection.query(
@@ -32,12 +42,12 @@ describe("POST /register", () => {
   });
 
   it("Returns 201 if sucess", async () => {
-    const result = await supertest(server).post("/register").send(userData);
+    const result = await supertest(app).post("/register").send(userData);
     expect(result.status).toEqual(201);
   });
 
   it("Registers the user in the database", async () => {
-    createUser();
+    await createUser();
     const result = await connection.query(
       `SELECT * FROM users WHERE email = $1;`,
       [userData.email]
@@ -51,8 +61,8 @@ describe("POST /register", () => {
   });
 
   it("Returns 409 if e-mail already used", async () => {
-    createUser();
-    const result = await supertest(server).post("/register").send(userData);
+    await createUser();
+    const result = await supertest(app).post("/register").send(userData);
     expect(result.status).toEqual(409);
   });
 
@@ -64,9 +74,7 @@ describe("POST /register", () => {
       passwordConfirm: encriptedPassword,
     };
 
-    const result = await supertest(server)
-      .post("/register")
-      .send(invaliduserData);
+    const result = await supertest(app).post("/register").send(invaliduserData);
     expect(result.status).toEqual(400);
   });
 });
@@ -84,42 +92,38 @@ describe("POST /login", () => {
   });
 
   it("Returns 404 if user not found", async () => {
-    createUser();
+    await createUser();
     const invalidLoginData = {
       email: "notregistred@test.com",
       password: "testpassword",
     };
-    const result = await supertest(server)
-      .post("/login")
-      .send(invalidLoginData);
+    const result = await supertest(app).post("/login").send(invalidLoginData);
     expect(result.status).toEqual(404);
   });
 
   it("Returns 401 if wrong password", async () => {
-    createUser();
+    await createUser();
     const invalidLoginData = {
       email: "test@test.com",
       password: "wrongpassword",
     };
-    const result = await supertest(server)
-      .post("/login")
-      .send(invalidLoginData);
+    const result = await supertest(app).post("/login").send(invalidLoginData);
     expect(result.status).toEqual(401);
   });
 
   it("Returns 200 if logged in sucessfully", async () => {
-    createUser();
+    await createUser();
     const validLoginData = {
       email: "test@test.com",
       password: "testpassword",
     };
 
-    const result = await supertest(server).post("/login").send(validLoginData);
+    const result = await supertest(app).post("/login").send(validLoginData);
     expect(result.status).toEqual(200);
   });
 
-  /* it("Creates a session in the database", async () => {
-    createUser();
+  it("Creates a session in the database", async () => {
+    await createUser();
     const validLoginData = {
       email: "test@test.com",
       password: "testpassword",
@@ -129,41 +133,45 @@ describe("POST /login", () => {
       `SELECT * FROM users WHERE password = $1;`,
       [userData.password]
     );
-    await supertest(server).post("/login").send(validLoginData);
+    await supertest(app).post("/login").send(validLoginData);
     const session = await connection.query(
       `SELECT * FROM sessions WHERE user_id = $1;`,
       [createdUser.rows[0].id]
     );
     expect(session.rowCount).toEqual(1);
-  });*/
+  });
 });
 
 describe("POST /logout", () => {
   it("Returns 404 session not found", async () => {
-    const result = await supertest(server)
+    const result = await supertest(app)
       .post("/logout")
       .send({ token: "asdlasdçlaskdaçlsdkaçsldk" });
     expect(result.status).toEqual(404);
   });
 
-  /* it("Returns 200 if logout was sucessful", async () => {
-    createUser();
+  it("Returns 200 if logout was sucessful", async () => {
+    await createUser();
+
     const validLoginData = {
       email: "test@test.com",
       password: "testpassword",
     };
+
     let createdUser = await connection.query(
       `SELECT * FROM users WHERE password = $1;`,
       [userData.password]
     );
-    await supertest(server).post("/login").send(validLoginData);
+
+    await supertest(app).post("/login").send(validLoginData);
 
     const session = await connection.query(
       `SELECT * FROM sessions WHERE user_id = $1;`,
       [createdUser.rows[0].id]
     );
+
     const token = session.rows[0].token;
-    const result = await supertest(server).post("/logout").send({ token });
+    const result = await supertest(app).post("/logout").send({ token });
     expect(result.status).toEqual(200);
-  }); */
+  });
 });
