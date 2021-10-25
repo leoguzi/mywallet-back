@@ -44,7 +44,7 @@ async function getEntries(req, res) {
     }
     const user_id = user.rows[0].user_id;
     const entries = await connection.query(
-      `SELECT * FROM entries WHERE user_id=$1;`,
+      `SELECT * FROM entries WHERE user_id=$1 ORDER BY id DESC;`,
       [user_id]
     );
     let balance = 0;
