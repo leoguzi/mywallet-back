@@ -5,24 +5,26 @@ import { userSchema } from "../schemas.js";
 
 async function registerUser(req, res) {
   if (userSchema.validate(req.body).error) {
-    return res.sendStatus(400);
+    return res.status(400).send({ message: "Invalid body!" });
   }
   const { name, email } = req.body;
-  const encriptedPassword = bcrypt.hashSync(req.body.password, 10);
 
   try {
     const user = await connection.query(`SELECT * FROM users WHERE email=$1;`, [
       email,
     ]);
     if (user.rowCount > 0) {
-      return res.sendStatus(409);
+      return res.status(409).send({ message: "E-mail already used!" });
     }
+
+    const encriptedPassword = bcrypt.hashSync(req.body.password, 10);
 
     await connection.query(
       `INSERT INTO users (name, email, password) VALUES ($1, $2, $3);`,
       [name, email.toLowerCase(), encriptedPassword]
     );
-    res.sendStatus(201);
+
+    return res.status(201).send({ message: "Created!" });
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -36,7 +38,7 @@ async function logIn(req, res) {
       email,
     ]);
     if (user.rowCount === 0) {
-      return res.sendStatus(404);
+      return res.status(404).send({ message: "E-mail not found!" });
     }
     user = user.rows[0];
 
@@ -47,9 +49,9 @@ async function logIn(req, res) {
         [user.id, token]
       );
 
-      return res.send({ name: user.name, token });
+      return res.status(200).send({ name: user.name, token });
     } else {
-      return res.sendStatus(401);
+      return res.status(401).send({ message: "Invalid password!" });
     }
   } catch (error) {
     console.log(error);
@@ -65,7 +67,7 @@ async function logOut(req, res) {
       [token]
     );
     if (response.rowCount === 0) {
-      return res.sendStatus(404);
+      return res.status(404).send({ message: "Invalid token!" });
     }
     return res.sendStatus(200);
   } catch (error) {

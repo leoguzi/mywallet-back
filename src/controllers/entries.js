@@ -3,7 +3,7 @@ import { entrySchema } from "../schemas.js";
 
 async function insertEntry(req, res) {
   if (entrySchema.validate(req.body).error || !req.headers.authorization) {
-    return res.sendStatus(403);
+    return res.status(400).send({ message: "Invalid body!" });
   }
   try {
     const token = req.headers.authorization.replace("Bearer ", "");
@@ -11,9 +11,11 @@ async function insertEntry(req, res) {
       `SELECT * FROM sessions WHERE token = $1;`,
       [token]
     );
+
     if (result.rowCount === 0) {
-      return res.sendStatus(401);
+      return res.status(401).send({ message: "Not logged in!" });
     }
+
     const { value, description } = req.body;
     const date = new Date();
     const user_id = result.rows[0].user_id;
@@ -21,7 +23,7 @@ async function insertEntry(req, res) {
       `INSERT INTO entries (user_id, date, value, description) VALUES ($1, $2, $3, $4);`,
       [user_id, date, value, description]
     );
-    return res.sendStatus(201);
+    return res.status(201).send({ message: "Created!" });
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -30,7 +32,7 @@ async function insertEntry(req, res) {
 
 async function getEntries(req, res) {
   if (!req.headers.authorization) {
-    return res.sendStatus(403);
+    return res.status(400).send({ message: "Invalid token!" });
   }
 
   try {
@@ -40,7 +42,7 @@ async function getEntries(req, res) {
       [token]
     );
     if (user.rowCount === 0) {
-      return res.sendStatus(401);
+      return res.status(401).send({ message: "Not logged in!" });
     }
     const user_id = user.rows[0].user_id;
     const entries = await connection.query(
@@ -55,7 +57,7 @@ async function getEntries(req, res) {
       entries: entries.rows,
       balance,
     };
-    return res.send(response);
+    return res.status(200).send(response);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);

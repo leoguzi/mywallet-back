@@ -8,7 +8,7 @@ const userSchema = joi.object({
 });
 
 const entrySchema = joi.object({
-  value: joi.number().required(),
+  value: joi.number().min(1).required(),
   description: joi.string().min(3).max(50).required(),
 });
 

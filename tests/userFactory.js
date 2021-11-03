@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 export default async function createUser() {
   const userData = {
     name: faker.name.findName(),
-    email: faker.internet.email(),
+    email: faker.internet.email().toLowerCase(),
     password: "123456",
     passwordConfirm: "123456",
     hashedPassword: bcrypt.hashSync("123456", 10),

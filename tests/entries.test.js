@@ -2,89 +2,125 @@ import "../src/setup.js";
 import app from "../src/app.js";
 import supertest from "supertest";
 import connection from "../src/database.js";
+import createUser from "./userFactory.js";
+import createSession from "./sessionFactory.js";
+import createEntrie from "./entriesFactory.js";
+import faker from "faker";
+import { v4 as uuid } from "uuid";
 
-const body = {
-  value: 35000,
-  description: "Hello, I'm a test case :)",
-};
+let user = {};
+let session = {};
+let newEntry = {};
+let config = {};
 
-const config = {
-  Authorization: "Bearer iamafalsetokenjustfortests:)",
-};
-
-async function createSession() {
-  await connection.query(
-    `INSERT INTO sessions (user_id, token) VALUES ($1, $2)`,
-    [0, "iamafalsetokenjustfortests:)"]
-  );
+async function prepareDatabase() {
+  user = await createUser();
+  session = await createSession(user);
+  config = {
+    Authorization: `Bearer ${session.token}`,
+  };
+  newEntry = {
+    value: ((Math.random() * 2 - 1 + 1) * 10000).toFixed(0),
+    description: faker.lorem.words(3),
+  };
 }
 
-afterAll(() => {
-  connection.end();
-});
+async function clearDatabase() {
+  await connection.query(`DELETE FROM entries;`);
+  await connection.query(`DELETE FROM users;`);
+  await connection.query(`DELETE FROM sessions;`);
+}
 
 describe("POST /entries", () => {
-  afterEach(async () => {
-    await connection.query(`DELETE FROM entries WHERE user_id = $1;`, [0]);
-    await connection.query(`DELETE FROM sessions WHERE user_id = $1`, [0]);
+  beforeEach(async () => {
+    await prepareDatabase();
   });
 
-  it("Returns 403 if no token", async () => {
-    createSession();
-    const result = await supertest(app).post("/entries").send(body);
-    expect(result.status).toEqual(403);
+  it("Returns 400 if no token", async () => {
+    const result = await supertest(app).post("/entries").send(newEntry);
+    expect(result.status).toEqual(400);
+    expect(result.body).toEqual({ message: "Invalid body!" });
   });
 
   it("Returns 401 if invalid token", async () => {
-    const result = await supertest(app).post("/entries").set(config).send(body);
-    expect(result.status).toEqual(401);
-  });
-
-  it("Returns 403 if invalid body", async () => {
-    createSession();
-    const invalidBody = {
-      value: 35000,
-    };
-
+    config.Authorization = `Bearer ${uuid()}`;
     const result = await supertest(app)
       .post("/entries")
       .set(config)
-      .send(invalidBody);
-    expect(result.status).toEqual(403);
+      .send(newEntry);
+    expect(result.status).toEqual(401);
+    expect(result.body).toEqual({ message: "Not logged in!" });
+  });
+
+  it("Returns 400 if invalid body", async () => {
+    delete newEntry.value;
+    const result = await supertest(app)
+      .post("/entries")
+      .set(config)
+      .send(newEntry);
+    expect(result.status).toEqual(400);
+    expect(result.body).toEqual({ message: "Invalid body!" });
   });
 
   it("Returns 201 for insertion success", async () => {
-    createSession();
-
-    const result = await supertest(app).post("/entries").set(config).send(body);
+    const result = await supertest(app)
+      .post("/entries")
+      .set(config)
+      .send(newEntry);
     expect(result.status).toEqual(201);
+    expect(result.body).toEqual({ message: "Created!" });
+  });
+
+  afterEach(async () => {
+    clearDatabase();
   });
 });
 
 describe("GET /entries", () => {
-  afterEach(async () => {
-    await connection.query(`DELETE FROM entries WHERE user_id = $1;`, [0]);
-    await connection.query(`DELETE FROM sessions WHERE user_id = $1`, [0]);
+  beforeEach(async () => {
+    await prepareDatabase();
   });
 
-  it("Returns 403 if no token", async () => {
-    createSession();
+  it("Returns 400 if no token", async () => {
     const result = await supertest(app).get("/entries");
-    expect(result.status).toEqual(403);
+    expect(result.status).toEqual(400);
+    expect(result.body).toEqual({ message: "Invalid token!" });
   });
 
   it("Returns 401 if invalid token", async () => {
-    createSession();
-    const config = {
-      Authorization: "Bearer tesettetaslkdflsdjaslkdj",
-    };
+    config.Authorization = `Bearer ${uuid()}`;
     const result = await supertest(app).get("/entries").set(config);
     expect(result.status).toEqual(401);
+    expect(result.body).toEqual({ message: "Not logged in!" });
   });
 
-  it("Returns 200 if valid token", async () => {
-    createSession();
+  it("Returns a list of entries if valid token", async () => {
+    const entry = await createEntrie(user.id);
     const result = await supertest(app).get("/entries").set(config);
+
     expect(result.status).toEqual(200);
+
+    result.body.entries[0].date = new Date(result.body.entries[0].date);
+
+    expect(result.body).toEqual({
+      entries: [
+        {
+          id: entry.id,
+          date: entry.date,
+          description: entry.description,
+          user_id: entry.user_id,
+          value: entry.value,
+        },
+      ],
+      balance: parseInt(entry.value),
+    });
   });
+
+  afterEach(async () => {
+    clearDatabase();
+  });
+});
+
+afterAll(() => {
+  connection.end();
 });
