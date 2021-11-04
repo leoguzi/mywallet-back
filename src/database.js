@@ -1,6 +1,13 @@
 import pg from 'pg';
+import dotenv from 'dotenv';
 
 const { Pool } = pg;
+
+const envFile = process.env.NODE_ENV === 'prod' ? '.env' : '.env.test';
+
+dotenv.config({
+  path: envFile,
+});
 
 const connection = new Pool({
   user: process.env.DB_USER,

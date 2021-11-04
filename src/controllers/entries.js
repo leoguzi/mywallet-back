@@ -2,7 +2,11 @@ import connection from '../database.js';
 import { entrySchema } from '../schemas.js';
 
 async function insertEntry(req, res) {
-  if (entrySchema.validate(req.body).error || !req.headers.authorization) {
+  if (
+    entrySchema.validate(req.body).error ||
+    !req.headers.authorization ||
+    req.body.value === 0
+  ) {
     return res.status(400).send({ message: 'Invalid body!' });
   }
   try {

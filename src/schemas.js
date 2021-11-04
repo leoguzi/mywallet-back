@@ -10,7 +10,7 @@ const userSchema = joi.object({
 });
 
 const entrySchema = joi.object({
-  value: joi.number().min(1).required(),
+  value: joi.number().required(),
   description: joi.string().min(3).max(50).required(),
 });
 
