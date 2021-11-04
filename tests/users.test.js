@@ -10,8 +10,8 @@ import createSession from './sessionFactory.js';
 let newUser = {};
 
 async function clearDatabase() {
-  await connection.query('DELETE FROM users;');
   await connection.query('DELETE FROM sessions;');
+  await connection.query('DELETE FROM users;');
 }
 
 describe('POST /register', () => {
@@ -124,7 +124,7 @@ describe('POST /logout', () => {
 
   it('Returns 200 if logout was sucessful', async () => {
     const user = await createUser();
-    const session = await createSession({ id: user.id });
+    const session = await createSession(user);
 
     const result = await supertest(app)
       .post('/logout')

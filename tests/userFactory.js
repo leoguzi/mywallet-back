@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import connection from '../src/database';
 
 export default async function createUser() {
-  const userData = {
+  let userData = {
     name: faker.name.findName(),
     email: faker.internet.email().toLowerCase(),
     password: '123456',
@@ -17,6 +17,6 @@ export default async function createUser() {
     [userData.name, userData.email, userData.hashedPassword]
   );
 
-  userData.id = insertedUser.rows[0].id;
+  userData = { ...userData, id: insertedUser.rows[0].id };
   return userData;
 }

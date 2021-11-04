@@ -26,9 +26,9 @@ async function prepareDatabase() {
 }
 
 async function clearDatabase() {
+  await connection.query('DELETE FROM sessions;');
   await connection.query('DELETE FROM entries;');
   await connection.query('DELETE FROM users;');
-  await connection.query('DELETE FROM sessions;');
 }
 
 describe('POST /entries', () => {
@@ -72,7 +72,7 @@ describe('POST /entries', () => {
   });
 
   afterEach(async () => {
-    clearDatabase();
+    await clearDatabase();
   });
 });
 
@@ -115,10 +115,10 @@ describe('GET /entries', () => {
   });
 
   afterEach(async () => {
-    clearDatabase();
+    await clearDatabase();
   });
 });
 
-afterAll(() => {
-  connection.end();
+afterAll(async () => {
+  await connection.end();
 });

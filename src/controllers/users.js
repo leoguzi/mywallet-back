@@ -19,11 +19,11 @@ async function registerUser(req, res) {
 
     const encriptedPassword = bcrypt.hashSync(req.body.password, 10);
 
-    await connection.query(
-      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3);',
+    const result = await connection.query(
+      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *;',
       [name, email.toLowerCase(), encriptedPassword]
     );
-
+    console.log(result.rows[0].id);
     return res.status(201).send({ message: 'Created!' });
   } catch (error) {
     console.log(error);

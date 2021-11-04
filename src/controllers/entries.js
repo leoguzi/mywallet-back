@@ -18,7 +18,7 @@ async function insertEntry(req, res) {
 
     const { value, description } = req.body;
     const date = new Date();
-    const { userId } = result.rows[0];
+    const userId = result.rows[0].user_id;
     await connection.query(
       'INSERT INTO entries (user_id, date, value, description) VALUES ($1, $2, $3, $4);',
       [userId, date, value, description]
