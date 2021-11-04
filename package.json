@@ -27,6 +27,11 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "faker": "^5.5.3"
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-import": "^2.25.2",
+    "faker": "^5.5.3",
+    "prettier": "2.4.1"
   }
 }
