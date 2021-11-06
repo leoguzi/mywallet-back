@@ -3,7 +3,14 @@ import dotenv from 'dotenv';
 
 const { Pool } = pg;
 
-const envFile = process.env.NODE_ENV === 'prod' ? '.env' : '.env.test';
+const envFile = '';
+let connString = '';
+
+if (process.env.NODE_ENV === 'prod') {
+  connString = process.env. 
+}
+
+ ? '.env' : '.env.test';
 
 dotenv.config({
   path: envFile,

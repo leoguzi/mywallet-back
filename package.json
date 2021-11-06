@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prod": "NODE_ENV=prod nodemon src/server.js",
+    "start": "NODE ENV= prod node src/server.js",
+    "dev": "NODE_ENV=dev nodemon src/server.js",
     "test": "NODE_ENV=test npx jest",
     "test-watch": "NODE_ENV=test npx jest --verbose --watch"
   },
@@ -22,6 +23,7 @@
     "express": "^4.17.1",
     "jest": "^27.3.1",
     "joi": "^17.4.2",
+    "ntl": "^5.1.0",
     "pg": "^8.7.1",
     "supertest": "^6.1.6",
     "uuid": "^8.3.2"
