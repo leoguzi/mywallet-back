@@ -5,10 +5,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "NODE ENV= prod node src/server.js",
+    "start": "NODE ENV=prod node src/server.js",
     "dev": "NODE_ENV=dev nodemon src/server.js",
-    "test": "NODE_ENV=test npx jest",
-    "test-watch": "NODE_ENV=test npx jest --verbose --watch"
+    "test": "NODE_ENV=test npx jest -i",
+    "test-watch": "NODE_ENV=test npx jest -i --verbose --watch"
   },
   "keywords": [],
   "author": "",
@@ -21,11 +21,8 @@
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "jest": "^27.3.1",
     "joi": "^17.4.2",
-    "ntl": "^5.1.0",
     "pg": "^8.7.1",
-    "supertest": "^6.1.6",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -34,6 +31,8 @@
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-import": "^2.25.2",
     "faker": "^5.5.3",
-    "prettier": "2.4.1"
+    "jest": "^27.3.1",
+    "prettier": "2.4.1",
+    "supertest": "^6.1.6"
   }
 }

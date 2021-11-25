@@ -1,5 +1,5 @@
 import connection from '../database.js';
-import { entrySchema } from '../schemas.js';
+import entrySchema from '../validation/entrySchema.js';
 
 async function insertEntry(req, res) {
   if (

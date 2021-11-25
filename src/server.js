@@ -1,4 +1,7 @@
 import './setup.js';
 import app from './app.js';
 
-app.listen(4000, () => 'Server listening on port 4000');
+app.listen(
+  process.env.PORT,
+  () => `Server listening on port ${process.env.PORT}`
+);

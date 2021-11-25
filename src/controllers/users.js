@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import bcrypt from 'bcrypt';
 import connection from '../database.js';
-import { userSchema } from '../schemas.js';
+import userSchema from '../validation/userSchema';
 
 async function registerUser(req, res) {
   if (userSchema.validate(req.body).error) {
