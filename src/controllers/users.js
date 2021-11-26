@@ -1,28 +1,23 @@
-import { v4 as uuid } from 'uuid';
-import bcrypt from 'bcrypt';
-import connection from '../database.js';
-import userSchema from '../validation/userSchema';
+import userSchema from '../validation/userSchema.js';
+import * as userService from '../services/userService.js';
+import * as sessionService from '../services/sessionService.js';
 
 async function registerUser(req, res) {
   if (userSchema.validate(req.body).error) {
-    return res.status(400).send({ message: 'Invalid body!' });
+    return res.status(400).send({ message: 'Bad request.' });
   }
-  const { name, email } = req.body;
+
+  const { name, email, password } = req.body;
 
   try {
-    const user = await connection.query('SELECT * FROM users WHERE email=$1;', [
-      email,
-    ]);
-    if (user.rowCount > 0) {
+    const user = await userService.getUserByEmail({ email });
+
+    if (user) {
       return res.status(409).send({ message: 'E-mail already used!' });
     }
 
-    const encriptedPassword = bcrypt.hashSync(req.body.password, 10);
+    await userService.createUser({ name, email, password });
 
-    await connection.query(
-      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3);',
-      [name, email.toLowerCase(), encriptedPassword]
-    );
     return res.status(201).send({ message: 'Created!' });
   } catch (error) {
     console.log(error);
@@ -32,25 +27,30 @@ async function registerUser(req, res) {
 
 async function logIn(req, res) {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).send({ message: 'Bad request.' });
+  }
+
   try {
-    let user = await connection.query('SELECT * FROM users WHERE email = $1;', [
-      email,
-    ]);
-    if (user.rowCount === 0) {
+    const user = await userService.getUserByEmail({ email });
+
+    if (!user) {
       return res.status(404).send({ message: 'E-mail not found!' });
     }
-    [user] = user.rows;
 
-    if (bcrypt.compareSync(password, user.password)) {
-      const token = uuid();
-      await connection.query(
-        'INSERT INTO sessions (user_id, token) VALUES ($1, $2);',
-        [user.id, token]
-      );
+    const isPasswordValid = userService.validatePassword({
+      password,
+      userPassword: user.password,
+    });
 
-      return res.status(200).send({ name: user.name, token });
+    if (!isPasswordValid) {
+      return res.status(401).send({ message: 'Invalid password!' });
     }
-    return res.status(401).send({ message: 'Invalid password!' });
+
+    const session = await sessionService.createSession({ idUser: user.id });
+
+    return res.status(200).send({ name: user.name, token: session.token });
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -59,15 +59,19 @@ async function logIn(req, res) {
 
 async function logOut(req, res) {
   const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).send({ message: 'Bad request.' });
+  }
+
   try {
-    const response = await connection.query(
-      'DELETE FROM sessions WHERE token = $1;',
-      [token]
-    );
-    if (response.rowCount === 0) {
+    const result = await sessionService.removeSession({ token });
+
+    if (!result) {
       return res.status(404).send({ message: 'Invalid token!' });
     }
-    return res.sendStatus(200);
+
+    return res.status(200).send({ message: 'Logged out.' });
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);

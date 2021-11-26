@@ -53,7 +53,7 @@ describe('POST /register', () => {
     delete newUser.name;
     const result = await supertest(app).post('/register').send(newUser);
     expect(result.status).toEqual(400);
-    expect(result.body).toEqual({ message: 'Invalid body!' });
+    expect(result.body).toEqual({ message: 'Bad request.' });
   });
 
   afterEach(async () => {
