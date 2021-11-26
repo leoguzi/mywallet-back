@@ -11,7 +11,14 @@ async function createSession({ idUser }) {
 
 async function removeSession({ token }) {
   const result = sessionRepository.deleteSession({ token });
+
   return result;
 }
 
-export { createSession, removeSession };
+async function getSession({ token }) {
+  const session = await sessionRepository.fetchSession({ token });
+
+  return session;
+}
+
+export { createSession, removeSession, getSession };

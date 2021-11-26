@@ -36,10 +36,10 @@ describe('POST /entries', () => {
     await prepareDatabase();
   });
 
-  it('Returns 400 if no token', async () => {
+  it('Returns 401 if no token', async () => {
     const result = await supertest(app).post('/entries').send(newEntry);
-    expect(result.status).toEqual(400);
-    expect(result.body).toEqual({ message: 'Invalid body!' });
+    expect(result.status).toEqual(401);
+    expect(result.body).toEqual({ message: 'Unauthorized.' });
   });
 
   it('Returns 401 if invalid token', async () => {
@@ -49,7 +49,7 @@ describe('POST /entries', () => {
       .set(config)
       .send(newEntry);
     expect(result.status).toEqual(401);
-    expect(result.body).toEqual({ message: 'Not logged in!' });
+    expect(result.body).toEqual({ message: 'Unauthorized.' });
   });
 
   it('Returns 400 if invalid body', async () => {
@@ -59,7 +59,7 @@ describe('POST /entries', () => {
       .set(config)
       .send(newEntry);
     expect(result.status).toEqual(400);
-    expect(result.body).toEqual({ message: 'Invalid body!' });
+    expect(result.body).toEqual({ message: 'Bad request.' });
   });
 
   it('Returns 201 for insertion success', async () => {
@@ -81,17 +81,17 @@ describe('GET /entries', () => {
     await prepareDatabase();
   });
 
-  it('Returns 400 if no token', async () => {
+  it('Returns 401 if no token', async () => {
     const result = await supertest(app).get('/entries');
-    expect(result.status).toEqual(400);
-    expect(result.body).toEqual({ message: 'Invalid token!' });
+    expect(result.status).toEqual(401);
+    expect(result.body).toEqual({ message: 'Unauthorized.' });
   });
 
   it('Returns 401 if invalid token', async () => {
     config.Authorization = `Bearer ${uuid()}`;
     const result = await supertest(app).get('/entries').set(config);
     expect(result.status).toEqual(401);
-    expect(result.body).toEqual({ message: 'Not logged in!' });
+    expect(result.body).toEqual({ message: 'Unauthorized.' });
   });
 
   it('Returns a list of entries if valid token', async () => {

@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import { registerUser, logIn, logOut } from './controllers/users.js';
-import { getEntries, insertEntry } from './controllers/entries.js';
+import { sessionAuthentication } from './middlewares/auth.js';
+import { registerUser, logIn, logOut } from './controllers/userController.js';
+import { getEntries, insertEntry } from './controllers/entryController.js';
 
 const app = express();
 app.use(cors());
@@ -11,7 +12,7 @@ app.post('/register', registerUser);
 app.post('/login', logIn);
 app.post('/logout', logOut);
 
-app.post('/entries', insertEntry);
-app.get('/entries', getEntries);
+app.post('/entries', sessionAuthentication, insertEntry);
+app.get('/entries', sessionAuthentication, getEntries);
 
 export default app;

@@ -1,4 +1,5 @@
 import connection from '../database.js';
+
 async function registerSession({ idUser, token }) {
   const result = await connection.query(
     'INSERT INTO sessions (user_id, token) VALUES ($1, $2) RETURNING *;',
@@ -19,4 +20,12 @@ async function deleteSession({ token }) {
   return true;
 }
 
-export { registerSession, deleteSession };
+async function fetchSession({ token }) {
+  const session = await connection.query(
+    'SELECT * FROM sessions WHERE token = $1;',
+    [token]
+  );
+  return session.rows[0];
+}
+
+export { registerSession, deleteSession, fetchSession };
