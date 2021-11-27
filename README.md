@@ -11,7 +11,8 @@ Try it out now at https://mywallet-front-henna.vercel.app/
 
 ## About
 
-This is the front-end of an web application on which you can create an account and register your dayly incomes and ravenues.
+This is the back-end of an web application on which you can create an account and register your daily incomes and ravenues.
+
 Features:
 
 - Sign Up;
@@ -48,9 +49,9 @@ The following tools and frameworks were used in the construction of the project:
 npm i
 ```
 
-5. Create the database using the provided dump file.
+5. Create the database using the provided dump  (mywallet.sql).
 
-6. Configure the enviroment variables using the .env.example file.
+6. Configure the environment variables using the .env.example file.
 
 7. Run the back-end on development mode with:
 
@@ -58,17 +59,22 @@ npm i
 npm run dev
 ```
 
-8. Run the tests with:
+8. Finally the API is up and ready to receive requests at port you configured at the .env file
+
+9. You can alternatively access the API directly on https://gratiboxleo.herokuapp.com/
+
+# Another information
+
+Run the tests with:
 
 ```bash
 npm run test
 ```
+or
 
-9. Finally the API is up and ready to receive requests at port you configured at the .env file
-
-10. You can alternatively access the API directly on https://gratiboxleo.herokuapp.com/
-
-# Another information
+```bash
+npm run test-watch
+```
 
 The production environment (npm start) is configured for the heroku deployment. If you wish to run in production locally you must edit the database.js file to point to a valid .env with the following the .env.exemple.
 
