@@ -146,7 +146,7 @@ Post request to the 'entries' route with the configuration and the body as follo
 Cofiguration:
 
 ```json
-headers:{
+"headers": {
   "Authorizarion": "Bearer sessionToken",
 }
 ```
@@ -170,11 +170,11 @@ Fetch user entries:
 
 Get request to the '/entries' route with the configuration as follows:
 
-````json
-headers:{
+```json
+"headers": {
   "Authorizarion": "Bearer sessionToken",
 }
-
+```
 It will return 401 if the user is not logged in or the token not provided and 200 if everything went fine. You can expect a objetc with all the entries from the logged user and the balance. Here is an example:
 
 ```json
@@ -195,6 +195,6 @@ It will return 401 if the user is not logged in or the token not provided and 20
     ],
     "balance":   5287600,
 }
-````
+```
 
 Feel free to contact me if you have any doubts or suggestions!
