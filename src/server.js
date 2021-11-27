@@ -1,7 +1,6 @@
 import './setup.js';
 import app from './app.js';
 
-app.listen(
-  process.env.PORT,
-  () => `Server listening on port ${process.env.PORT}`
+app.listen(process.env.PORT, () =>
+  console.log(`Server listening on port ${process.env.PORT}`)
 );
