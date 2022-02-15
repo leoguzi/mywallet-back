@@ -74,7 +74,7 @@ or
 npm run test-watch
 ```
 
-The production environment (npm start) is configured for the heroku deployment. If you wish to run in production locally you must edit the database.js file to point to a valid .env with the following the .env.exemple.
+The production environment (npm start) is configured for the heroku deployment. If you wish to run in production locally you must edit the database.js file to point to a valid .env file following the .env.exemple.
 
 # Routes Guide
 
